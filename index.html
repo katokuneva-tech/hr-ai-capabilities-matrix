@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR → AI: Карта замены ролей и функций</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--card:#13131a;--card-hover:#1a1a24;--border:#1e1e2e;--text:#e8e8f0;--text-sec:#8888a0;--text-muted:#555570;--accent:#6366f1;--accent-light:#818cf8;--green:#10b981;--green-bg:rgba(16,185,129,.08);--orange:#f59e0b;--orange-bg:rgba(245,158,11,.08);--red:#ef4444;--red-bg:rgba(239,68,68,.08);--blue:#3b82f6;--blue-bg:rgba(59,130,246,.08);--purple:#a855f7;--purple-bg:rgba(168,85,247,.08);--yellow:#eab308;--yellow-bg:rgba(234,179,8,.08);--cyan:#06b6d4;--cyan-bg:rgba(6,182,212,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Onest',sans-serif;background:var(--bg);color:var(--text);line-height:1.65;-webkit-font-smoothing:antialiased}
+.mono{font-family:'JetBrains Mono',monospace}
+
+.hero{padding:4rem 2rem 2.5rem;max-width:1400px;margin:0 auto;text-align:center}
+.hero-badge{display:inline-block;padding:.35rem 1rem;border:1px solid var(--accent);border-radius:20px;font-size:.75rem;color:var(--accent-light);letter-spacing:.04em;text-transform:uppercase;margin-bottom:2rem}
+.hero h1{font-size:2.8rem;font-weight:900;line-height:1.1;margin-bottom:1rem;background:linear-gradient(135deg,#e8e8f0 0%,#818cf8 50%,#a855f7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:1.05rem;color:var(--text-sec);max-width:850px;margin:0 auto}
+
+.sec{max-width:1400px;margin:0 auto;padding:3rem 2rem 1rem}
+.sec-label{font-size:.72rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+.sec h2{font-size:2rem;font-weight:800;margin-bottom:.5rem}
+.sec .desc{color:var(--text-sec);font-size:.95rem;margin-bottom:2rem;max-width:800px}
+
+/* ===== LEVEL 0: TOP SUMMARY TABLE ===== */
+.l0-wrap{max-width:1400px;margin:0 auto;padding:0 2rem 2rem;overflow-x:auto}
+.l0-table{width:100%;border-collapse:collapse;font-size:.84rem}
+.l0-table th{text-align:left;padding:.7rem 1rem;font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);border-bottom:2px solid var(--border);background:rgba(99,102,241,.03);white-space:nowrap}
+.l0-table td{padding:.75rem 1rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.l0-table tr:last-child td{border-bottom:none}
+.l0-table tr:hover td{background:rgba(99,102,241,.03)}
+.l0-table .l0-name{font-weight:700;color:var(--accent-light);white-space:nowrap}
+.l0-table .l0-role{font-size:.78rem;color:var(--text-muted)}
+.l0-table .mono-val{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.82rem}
+
+.tag{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;font-weight:600;white-space:nowrap}
+.tag-high{background:var(--green-bg);color:var(--green);border:1px solid rgba(16,185,129,.2)}
+.tag-med{background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(234,179,8,.2)}
+.tag-low{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.35rem;vertical-align:middle}
+.dot-green{background:var(--green)}
+.dot-yellow{background:var(--yellow)}
+.dot-red{background:var(--red)}
+
+/* ===== LEVEL 1: ROLES MAP ===== */
+.roles-map{max-width:1400px;margin:0 auto;padding:0 2rem 2rem}
+.domain-group{margin-bottom:2rem}
+.domain-label{font-size:.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;padding-left:.5rem;display:flex;align-items:center;gap:.6rem}
+.domain-label::before{content:'';width:3px;height:14px;border-radius:2px;flex-shrink:0}
+.domain-label.d-recruit::before{background:var(--blue)}
+.domain-label.d-ops::before{background:var(--green)}
+.domain-label.d-dev::before{background:var(--purple)}
+.domain-label.d-analytics::before{background:var(--cyan)}
+.domain-label.d-comp::before{background:var(--orange)}
+.domain-label.d-strategy::before{background:var(--red)}
+.roles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.75rem}
+.role-chip{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.5rem;transition:border-color .2s,transform .15s}
+.role-chip:hover{border-color:rgba(99,102,241,.3);transform:translateY(-1px)}
+.role-chip-top{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.role-chip-name{font-size:.92rem;font-weight:700;color:var(--text)}
+.role-chip-bottom{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.chip-status{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .6rem;border-radius:5px;font-size:.7rem;font-weight:600;white-space:nowrap}
+.cs-active{background:var(--green-bg);color:var(--green);border:1px solid rgba(16,185,129,.2)}
+.cs-none{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.cs-future{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(168,85,247,.2)}
+.chip-fte{font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--text-muted)}
+.chip-link{font-size:.7rem;color:var(--accent-light);text-decoration:none;cursor:pointer}
+.chip-link:hover{text-decoration:underline}
+.chip-desc{font-size:.78rem;color:var(--text-muted);line-height:1.5;margin-top:.15rem}
+
+.counter-bar{max-width:1400px;margin:0 auto 1rem;padding:0 2rem}
+.counter-inner{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.counter{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;text-align:center}
+.counter-num{font-size:2.2rem;font-weight:900;font-family:'JetBrains Mono',monospace;line-height:1.1}
+.counter-num.c-green{color:var(--green)}
+.counter-num.c-yellow{color:var(--yellow)}
+.counter-num.c-red{color:var(--red)}
+.counter-num.c-accent{color:var(--accent-light)}
+.counter-lbl{font-size:.75rem;color:var(--text-muted);margin-top:.3rem}
+
+.divider{max-width:1400px;margin:1rem auto 0;padding:0 2rem}
+.divider-line{border:none;border-top:2px solid var(--border)}
+
+/* ===== LEVEL 2: DETAIL TABLES ===== */
+.role-section{max-width:1400px;margin:0 auto 2rem;padding:0 2rem}
+.role-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.role-header{display:flex;align-items:center;gap:1.25rem;padding:1.5rem 2rem;border-bottom:1px solid var(--border)}
+.role-num{width:44px;height:44px;border-radius:10px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;flex-shrink:0}
+.role-info{flex:1}
+.role-title{font-size:1.2rem;font-weight:800;color:var(--text)}
+.role-replaces{font-size:.8rem;color:var(--accent-light);margin-top:.15rem}
+.role-meta{display:flex;gap:.5rem;flex-wrap:wrap;flex-shrink:0}
+.badge{padding:.3rem .75rem;border-radius:6px;font-size:.72rem;font-weight:600;white-space:nowrap}
+.b-fte{background:var(--green-bg);color:var(--green);border:1px solid rgba(16,185,129,.2)}
+.b-stage{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+
+.cap-table{width:100%;border-collapse:collapse}
+.cap-table th{text-align:left;padding:.55rem .75rem;font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);border-bottom:1px solid var(--border);background:rgba(99,102,241,.02);white-space:nowrap}
+.cap-table td{padding:.55rem .75rem;border-bottom:1px solid rgba(30,30,46,.5);font-size:.82rem;vertical-align:middle}
+.cap-table tr:last-child td{border-bottom:none}
+.cap-table tr:hover td{background:rgba(99,102,241,.03)}
+.cap-table .cap-name{color:var(--text);font-weight:500}
+.cap-table .cap-date{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--blue);font-weight:500;white-space:nowrap}
+.cap-table .cap-num{color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:.72rem;width:24px}
+.cap-table .mono-sm{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;white-space:nowrap}
+
+.status{display:inline-flex;align-items:center;gap:.3rem;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;font-weight:600;white-space:nowrap}
+.s-yes{background:var(--green-bg);color:var(--green);border:1px solid rgba(16,185,129,.2)}
+.s-partial{background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(234,179,8,.2)}
+.s-no{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+
+/* EDITABLE CELLS */
+[contenteditable]{cursor:text;border-bottom:1px dashed rgba(99,102,241,.3);transition:background .2s,border-color .2s;border-radius:3px;padding:1px 4px;margin:-1px -4px}
+[contenteditable]:hover{background:rgba(99,102,241,.08);border-bottom-color:var(--accent-light)}
+[contenteditable]:focus{outline:none;background:rgba(99,102,241,.12);border-bottom-color:var(--accent);box-shadow:0 0 0 2px rgba(99,102,241,.15)}
+
+/* SUMMARY */
+.summary-section{max-width:1400px;margin:2rem auto;padding:0 2rem}
+.summary-card{background:linear-gradient(135deg,rgba(16,185,129,.06),rgba(99,102,241,.06));border:1px solid rgba(99,102,241,.15);border-radius:16px;padding:2rem}
+.summary-card h2{font-size:1.4rem;font-weight:800;margin-bottom:1.25rem;color:var(--accent-light)}
+
+.foot{max-width:1400px;margin:0 auto;padding:2rem;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border);text-align:center}
+
+@media(max-width:1100px){
+  .hero h1{font-size:2rem}
+  .counter-inner{grid-template-columns:repeat(2,1fr)}
+  .roles-grid{grid-template-columns:1fr}
+  .role-header{flex-wrap:wrap}
+  .role-meta{width:100%;margin-top:.5rem}
+  .l0-wrap{margin-left:-1rem;margin-right:-1rem}
+}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-badge">Призма: AI-сотрудник как полная замена</div>
+  <h1>Все HR-роли vs AI-замена</h1>
+  <p class="hero-sub">Уровень 0 — верхнеуровневая аналитика по AI-сотрудникам. Уровень 1 — карта всех HR-ролей. Уровень 2 — детализация по функциям.</p>
+</section>
+
+<!-- ======================================================== -->
+<!-- LEVEL 0: ВЕРХНЕУРОВНЕВАЯ АНАЛИТИКА -->
+<!-- ======================================================== -->
+<section class="sec">
+  <div class="sec-label">Уровень 0</div>
+  <h2>AI-сотрудники: сводная аналитика</h2>
+  <p class="desc">Каждый AI-сотрудник как строка. Вес в HR-функции, потенциал автоматизации, денежный эффект, измеримость, статус, MVP, риск. Цифры основаны на исследованиях Gartner, Mercer, Deloitte, SHRM, McKinsey, Bersin и кейсах вендоров.</p>
+</section>
+
+<div class="l0-wrap">
+  <table class="l0-table">
+    <thead>
+      <tr>
+        <th>AI-сотрудник</th>
+        <th>Заменяемая роль</th>
+        <th>Вес в HR&nbsp;(%)&nbsp;<span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.6" title="Доля роли в общей HR-функции. 8 ролей = ~50%, остальные 50% — роли без AI-замены">&#9432;</span></th>
+        <th>Автоматиз.&nbsp;процесса&nbsp;(%)</th>
+        <th>Денежный эффект</th>
+        <th>Измеримость</th>
+        <th>Делаем</th>
+        <th>MVP</th>
+        <th>Риск</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="l0-name">Цифровой HR-консультант</td>
+        <td class="l0-role">HR-спец. по обращениям</td>
+        <td class="mono-val">12%<sup>1</sup></td>
+        <td class="mono-val" style="color:var(--green)">70%<sup>2</sup></td>
+        <td><span class="tag tag-high">High</span></td>
+        <td><span class="tag tag-high">High</span></td>
+        <td><span class="dot dot-green"></span>Да</td>
+        <td class="mono-val" contenteditable="true">Q2 2026</td>
+        <td><span class="tag tag-high">Низкий</span></td>
+      </tr>
+      <tr>
+        <td class="l0-name">Цифровой рекрутер</td>
+        <td class="l0-role">Рекрутер масс. найма</td>
+        <td class="mono-val">10%<sup>1</sup></td>
+        <td class="mono-val" style="color:var(--green)">65%<sup>3</sup></td>
+        <td><span class="tag tag-high">High</span></td>
+        <td><span class="tag tag-high">High</span></td>
+        <td><span class="dot dot-green"></span>Да</td>
+        <td class="mono-val" contenteditable="true">Q1-Q2 2026</td>
+        <td><span class="tag tag-med">Средний</span></td>
+      </tr>
+      <tr>
+        <td class="l0-name">Цифровой ресёрчер</td>
+        <td class="l0-role">Ресёрчер exec. search</td>
+        <td class="mono-val">3%<sup>1</sup></td>
+        <td class="mono-val" style="color:var(--yellow)">45%<sup>*</sup></td>
+        <td><span class="tag tag-med">Medium</span></td>
+        <td><span class="tag tag-med">Medium</span></td>
+        <td><span class="dot dot-green"></span>Да</td>
+        <td class="mono-val" contenteditable="true">Q3 2026</td>
+        <td><span class="tag tag-med">Средний</span></td>
+      </tr>
+      <tr>
+        <td class="l0-name">Цифровой скринер резюме</td>
+        <td class="l0-role">Рекрутер (скрининг)</td>
+        <td class="mono-val">5%<sup>1</sup></td>
+        <td class="mono-val" style="color:var(--green)">88%<sup>4</sup></td>
+        <td><span class="tag tag-high">High</span></td>
+        <td><span class="tag tag-high">High</span></td>
+        <td><span class="dot dot-green"></span>Да</td>
+        <td class="mono-val" contenteditable="true">Q2 2026</td>
+        <td><span class="tag tag-high">Низкий</span></td>
+      </tr>
+      <tr>
+        <td class="l0-name">Цифровой наставник</td>
+        <td class="l0-role">Buddy + HR адаптации</td>
+        <td class="mono-val">5%<sup>1</sup></td>
+        <td class="mono-val" style="color:var(--yellow)">65%<sup>5</sup></td>
+        <td><span class="tag tag-high">High</span></td>
+        <td><span class="tag tag-high">High</span></td>
+        <td><span class="dot dot-green"></span>Да</td>
+        <td class="mono-val" contenteditable="true">Q3 2026</td>
+        <td><span class="tag tag-high">Низкий</span></td>
+      </tr>
+      <tr>
+        <td class="l0-name">Цифровой аналитик</td>
+        <td class="l0-role">HR-аналитик / HRBP</td>
+        <td class="mono-val">4%<sup>1</sup></td>
+        <td class="mono-val" style="color:var(--yellow)">60%<sup>6</sup></td>
+        <td><span class="tag tag-high">High</span></td>
+        <td><span class="tag tag-med">Medium</span></td>
+        <td><span class="dot dot-green"></span>Да</td>
+        <td class="mono-val" contenteditable="true">Q3 2026</td>
+        <td><span class="tag tag-med">Средний</span></td>
+      </tr>
+      <tr>
+        <td class="l0-name">Цифровой фасилитатор OKR</td>
+        <td class="l0-role">HR-спец. + менеджеры</td>
+        <td class="mono-val">3%<sup>1</sup></td>
+        <td class="mono-val" style="color:var(--yellow)">40%<sup>*</sup></td>
+        <td><span class="tag tag-high">High</span></td>
+        <td><span class="tag tag-med">Medium</span></td>
+        <td><span class="dot dot-yellow"></span>Частично</td>
+        <td class="mono-val" contenteditable="true">Q2 2026</td>
+        <td><span class="tag tag-med">Средний</span></td>
+      </tr>
+      <tr>
+        <td class="l0-name">Цифровой тренер</td>
+        <td class="l0-role">Тренер / L&D</td>
+        <td class="mono-val">8%<sup>1</sup></td>
+        <td class="mono-val" style="color:var(--yellow)">35%<sup>7</sup></td>
+        <td><span class="tag tag-med">Medium</span></td>
+        <td><span class="tag tag-low">Low</span></td>
+        <td><span class="dot dot-yellow"></span>Частично</td>
+        <td class="mono-val" contenteditable="true">Q4 2026</td>
+        <td><span class="tag tag-low">Высокий</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:1.25rem;font-size:.75rem;color:var(--text-muted);line-height:1.8">
+    <div style="margin-bottom:.75rem"><span style="color:var(--yellow);font-weight:700">*</span> — гипотеза, требует валидации (нет прямых отраслевых бенчмарков для executive search AI и OKR-автоматизации)</div>
+    <div><strong style="color:var(--text-sec)">Источники:</strong></div>
+    <div><sup>1</sup> <strong>Вес в HR</strong> — Gartner HR Budget Benchmarks 2024-2025; Mercer HR Operations Scanner 2023 (~60% HR на administration, recruiting = 20-25% FTE, service desk = 10-15%, L&D = 10-15%, analytics = 2-5%, perf mgmt = 3-5%, onboarding = 3-5%)</div>
+    <div><sup>2</sup> <strong>Service Desk 70%</strong> — Moveworks: 88% autonomous resolution (Broadcom); Leena AI: 70%+ adoption, 90% resolution; ServiceNow: 88% virtual agent success; Espressive Barista: 50-70% deflection. Консервативная оценка: 50-70% типичное внедрение</div>
+    <div><sup>3</sup> <strong>Рекрутинг 65%</strong> — ADP: 40-60% manual effort reduction; Paradox: >90% для mass hiring; 70-80% времени рекрутера на sourcing+screening+scheduling (Shortlistd, SmartRecruiters). Blend: 65%</div>
+    <div><sup>4</sup> <strong>Скрининг 88%</strong> — AI screening accuracy 85-95% vs 70% manual (ResearchGate); HireVue: 750+ резюме/час; time savings 50-80%; SHRM: 44% компаний уже используют AI для скрининга</div>
+    <div><sup>5</sup> <strong>Онбординг 65%</strong> — 67-68% компаний США уже используют AI в онбординге; сокращение HR-времени с 10ч до 2ч на найм (80% admin tasks); Leena AI: retention +50%, productivity +50%. Общая оценка с учётом human-touch элементов: 65%</div>
+    <div><sup>6</sup> <strong>HR-аналитика 60%</strong> — Deloitte: 57% HR-времени на admin; Perceptyx: AI-анализ за секунды vs 14 аналитиков x 200 часов; performance review: 97% time savings (часы→минуты). С учётом interpretation: 60%</div>
+    <div><sup>7</sup> <strong>L&D 35%</strong> — Bersin: >60% L&D автоматизируемо AI (потенциал). Текущее состояние для прототипа значительно ниже: 20-30% экономии затрат (eLearning Industry). Оценка текущего скоупа: 35%</div>
+  </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- LEVEL 1: КАРТА HR-РОЛЕЙ -->
+<!-- ======================================================== -->
+<div class="divider"><hr class="divider-line"></div>
+
+<section class="sec">
+  <div class="sec-label">Уровень 1</div>
+  <h2>Карта HR-ролей организации</h2>
+  <p class="desc">Все ключевые HR-роли по доменам. По каждой — статус AI-замены в роадмапе 2026.</p>
+</section>
+
+<div class="counter-bar">
+  <div class="counter-inner">
+    <div class="counter"><div class="counter-num c-accent">20</div><div class="counter-lbl">HR-ролей всего</div></div>
+    <div class="counter"><div class="counter-num c-green">8</div><div class="counter-lbl">заменяем AI (2026)</div></div>
+    <div class="counter"><div class="counter-num c-yellow">5</div><div class="counter-lbl">потенциал</div></div>
+    <div class="counter"><div class="counter-num c-red">7</div><div class="counter-lbl">не заменяем</div></div>
+  </div>
+</div>
+
+<div class="roles-map">
+  <div class="domain-group">
+    <div class="domain-label d-recruit">Рекрутинг и найм</div>
+    <div class="roles-grid">
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Рекрутер массового найма</span><span class="chip-status cs-active">AI-замена</span></div><div class="chip-desc">Закрывает потоковые вакансии: сорсинг, первичный контакт, скрининг, воронка</div><div class="role-chip-bottom"><span class="chip-fte">40-50% FTE</span><a href="#role-2" class="chip-link">10 функций &darr;</a></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Ресёрчер (executive search)</span><span class="chip-status cs-active">AI-замена</span></div><div class="chip-desc">Находит топ-менеджеров: маппинг рынка, профайлинг, граф связей, репутация</div><div class="role-chip-bottom"><span class="chip-fte">30-40% FTE</span><a href="#role-3" class="chip-link">10 функций &darr;</a></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Скринер резюме</span><span class="chip-status cs-active">AI-замена</span></div><div class="chip-desc">Отсеивает нерелевантных кандидатов: парсинг, матчинг, ранжирование, short-list</div><div class="role-chip-bottom"><span class="chip-fte">70-80% FTE</span><a href="#role-4" class="chip-link">10 функций &darr;</a></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Интервьюер / оценщик</span><span class="chip-status cs-none">Не заменяем</span></div><div class="chip-desc">Проводит глубинные интервью, оценивает soft skills и культурный fit кандидата</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Employer brand менеджер</span><span class="chip-status cs-none">Не заменяем</span></div><div class="chip-desc">Строит бренд работодателя: EVP, контент, соцсети, мероприятия, рейтинги</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+    </div>
+  </div>
+  <div class="domain-group">
+    <div class="domain-label d-ops">HR-операции и сервис</div>
+    <div class="roles-grid">
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">HR-консультант (service desk)</span><span class="chip-status cs-active">AI-замена</span></div><div class="chip-desc">Отвечает на вопросы сотрудников: отпуска, справки, ДМС, политики, маршрутизация</div><div class="role-chip-bottom"><span class="chip-fte">60-70% FTE</span><a href="#role-1" class="chip-link">11 функций &darr;</a></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Наставник по адаптации (buddy)</span><span class="chip-status cs-active">AI-замена</span></div><div class="chip-desc">Ведёт новичка от первого дня до конца испытательного: обучение, чек-листы, Q&A</div><div class="role-chip-bottom"><span class="chip-fte">35-45% FTE</span><a href="#role-5" class="chip-link">10 функций &darr;</a></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Кадровый делопроизводитель</span><span class="chip-status cs-future">Потенциал</span></div><div class="chip-desc">Оформляет приёмы, увольнения, переводы, ведёт трудовые книжки и личные дела</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Администратор HR-систем</span><span class="chip-status cs-none">Не заменяем</span></div><div class="chip-desc">Настраивает и поддерживает 1С ЗУП, SAP HCM, ATS — права, роли, интеграции</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+    </div>
+  </div>
+  <div class="domain-group">
+    <div class="domain-label d-dev">Развитие и обучение (L&D)</div>
+    <div class="roles-grid">
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Тренер / L&D-специалист</span><span class="chip-status cs-active">AI-замена</span></div><div class="chip-desc">Проводит тренинги, развивает навыки сотрудников, адаптивное обучение под роль</div><div class="role-chip-bottom"><span class="chip-fte">20-30% FTE</span><a href="#role-8" class="chip-link">10 функций &darr;</a></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Инструкционный дизайнер</span><span class="chip-status cs-future">Потенциал</span></div><div class="chip-desc">Проектирует обучающие программы, курсы и учебные материалы от сценария до LMS</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Карьерный консультант / коуч</span><span class="chip-status cs-future">Потенциал</span></div><div class="chip-desc">Индивидуальная работа с сотрудником: карьерный трек, развитие лидерства, коучинг</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+    </div>
+  </div>
+  <div class="domain-group">
+    <div class="domain-label d-analytics">Аналитика и эффективность</div>
+    <div class="roles-grid">
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">HR-аналитик / аналитик вовлечённости</span><span class="chip-status cs-active">AI-замена</span></div><div class="chip-desc">Анализирует performance review, опросы, предсказывает риск ухода, даёт рекомендации</div><div class="role-chip-bottom"><span class="chip-fte">50-60% FTE</span><a href="#role-6" class="chip-link">10 функций &darr;</a></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Специалист по целеполаганию (OKR)</span><span class="chip-status cs-active">AI-замена</span></div><div class="chip-desc">Помогает ставить цели, каскадировать OKR, оптимизировать стоимость совещаний</div><div class="role-chip-bottom"><span class="chip-fte">40% HR + 30% менеджеров</span><a href="#role-7" class="chip-link">10 функций &darr;</a></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Специалист по оргдизайну</span><span class="chip-status cs-future">Потенциал</span></div><div class="chip-desc">Проектирует оргструктуру, штатное расписание, грейды и модели управления</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+    </div>
+  </div>
+  <div class="domain-group">
+    <div class="domain-label d-comp">Компенсации и льготы (C&B)</div>
+    <div class="roles-grid">
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">C&B-аналитик</span><span class="chip-status cs-future">Потенциал</span></div><div class="chip-desc">Анализирует рынок зарплат, строит грейды, моделирует бонусные схемы и ФОТ</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Специалист по льготам и бенефитам</span><span class="chip-status cs-none">Не заменяем</span></div><div class="chip-desc">Управляет ДМС, страховками, корп. программами — переговоры с провайдерами</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+    </div>
+  </div>
+  <div class="domain-group">
+    <div class="domain-label d-strategy">Стратегические и партнёрские роли</div>
+    <div class="roles-grid">
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">HRBP (HR бизнес-партнёр)</span><span class="chip-status cs-none">Не заменяем</span></div><div class="chip-desc">Стратегический партнёр бизнеса: орг. изменения, конфликты, удержание ключевых людей</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">HR-директор / HRD</span><span class="chip-status cs-none">Не заменяем</span></div><div class="chip-desc">Формирует HR-стратегию, управляет функцией, представляет HR на уровне борда</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+      <div class="role-chip"><div class="role-chip-top"><span class="role-chip-name">Специалист по корп. культуре</span><span class="chip-status cs-none">Не заменяем</span></div><div class="chip-desc">Развивает ценности, внутренние коммуникации, вовлечённость и корп. мероприятия</div><div class="role-chip-bottom"><span class="chip-fte">—</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- LEVEL 2: ДЕТАЛИЗАЦИЯ ПО ФУНКЦИЯМ -->
+<!-- ======================================================== -->
+<div class="divider"><hr class="divider-line"></div>
+
+<section class="sec">
+  <div class="sec-label">Уровень 2</div>
+  <h2>Детализация: функции каждой роли</h2>
+  <p class="desc">8 ролей с AI-заменой. Каждая функция: вес, потенциал автоматизации, денежный эффект, измеримость, статус, MVP, риск.</p>
+</section>
+
+<!-- 1. HR-КОНСУЛЬТАНТ -->
+<div class="role-section" id="role-1">
+  <div class="role-card">
+    <div class="role-header">
+      <div class="role-num">1</div>
+      <div class="role-info">
+        <div class="role-title">HR-консультант (service desk)</div>
+        <div class="role-replaces">AI-замена: Цифровой HR-консультант | 60-70% FTE</div>
+      </div>
+      <div class="role-meta"><span class="badge b-fte">60-70% FTE</span><span class="badge b-stage">Q2-Q3 2026</span></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="cap-table">
+      <thead><tr><th>#</th><th>Функция</th><th>Вес</th><th>Автоматиз.</th><th>Ден. эффект</th><th>Измеримость</th><th>Делаем</th><th>MVP</th><th>Риск</th></tr></thead>
+      <tbody>
+        <tr><td class="cap-num">1</td><td class="cap-name">Ответы на типовые HR-вопросы (отпуска, справки, ДМС)</td><td class="mono-sm">25%</td><td class="mono-sm" style="color:var(--green)">90%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">2</td><td class="cap-name">Консультации по ЛНА, политикам и регламентам</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--green)">85%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">3</td><td class="cap-name">Персонализация ответов (должность, подразделение, стаж)</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--green)">80%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">4</td><td class="cap-name">Маршрутизация обращений по категориям</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--green)">85%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">5</td><td class="cap-name">Интеграция с HR-системами (1С, Directum, CoCo)</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--green)">75%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2-Q3</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">6</td><td class="cap-name">Формирование и выдача справок, выписок</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">7</td><td class="cap-name">Отслеживание статуса обращения (трекинг)</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">65%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">8</td><td class="cap-name">Эскалация сложных кейсов на живого HR</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--green)">80%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">9</td><td class="cap-name">Проактивные уведомления и напоминания</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--green)">75%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">10</td><td class="cap-name">Аналитика обращений, дашборды</td><td class="mono-sm">3%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">11</td><td class="cap-name">Сбор обратной связи по качеству (CSAT)</td><td class="mono-sm">2%</td><td class="mono-sm" style="color:var(--green)">80%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-high">Низкий</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- 2. РЕКРУТЕР МАССОВОГО НАЙМА -->
+<div class="role-section" id="role-2">
+  <div class="role-card">
+    <div class="role-header">
+      <div class="role-num">2</div>
+      <div class="role-info">
+        <div class="role-title">Рекрутер массового найма</div>
+        <div class="role-replaces">AI-замена: Цифровой рекрутер | 40-50% FTE</div>
+      </div>
+      <div class="role-meta"><span class="badge b-fte">40-50% FTE</span><span class="badge b-stage">Q1-Q2 2026</span></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="cap-table">
+      <thead><tr><th>#</th><th>Функция</th><th>Вес</th><th>Автоматиз.</th><th>Ден. эффект</th><th>Измеримость</th><th>Делаем</th><th>MVP</th><th>Риск</th></tr></thead>
+      <tbody>
+        <tr><td class="cap-num">1</td><td class="cap-name">Размещение вакансий на площадках</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--green)">75%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">2</td><td class="cap-name">Массовый сорсинг и поиск кандидатов</td><td class="mono-sm">20%</td><td class="mono-sm" style="color:var(--green)">80%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">3</td><td class="cap-name">Автоотклик и первичный контакт</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--green)">85%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">4</td><td class="cap-name">Телефонный / чат-скрининг</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--yellow)">65%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">5</td><td class="cap-name">Координация и планирование собеседований</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">6</td><td class="cap-name">Управление воронкой найма и статусами</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--green)">70%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">7</td><td class="cap-name">Формирование и отправка офферов</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--red)">30%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-low">Высокий</span></td></tr>
+        <tr><td class="cap-num">8</td><td class="cap-name">Коммуникация отказов кандидатам</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">50%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">9</td><td class="cap-name">Аналитика найма (time-to-hire, cost-per-hire)</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">10</td><td class="cap-name">Ведение и обогащение talent pool</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">55%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- 3. РЕСЁРЧЕР -->
+<div class="role-section" id="role-3">
+  <div class="role-card">
+    <div class="role-header">
+      <div class="role-num">3</div>
+      <div class="role-info">
+        <div class="role-title">Ресёрчер (executive search)</div>
+        <div class="role-replaces">AI-замена: Цифровой ресёрчер | 30-40% FTE</div>
+      </div>
+      <div class="role-meta"><span class="badge b-fte">30-40% FTE</span><span class="badge b-stage">Q3 2026</span></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="cap-table">
+      <thead><tr><th>#</th><th>Функция</th><th>Вес</th><th>Автоматиз.</th><th>Ден. эффект</th><th>Измеримость</th><th>Делаем</th><th>MVP</th><th>Риск</th></tr></thead>
+      <tbody>
+        <tr><td class="cap-num">1</td><td class="cap-name">Маппинг рынка и формирование long-list</td><td class="mono-sm">20%</td><td class="mono-sm" style="color:var(--green)">80%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">2</td><td class="cap-name">Построение графа профессиональных связей</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-low">Высокий</span></td></tr>
+        <tr><td class="cap-num">3</td><td class="cap-name">Digital Footprint — анализ цифрового следа</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--green)">75%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">4</td><td class="cap-name">Оценка репутационных и комплаенс-рисков</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">65%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">5</td><td class="cap-name">Формирование short-list с ранжированием</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">55%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">6</td><td class="cap-name">Outreach — первичный контакт с кандидатами</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--red)">25%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-low">Высокий</span></td></tr>
+        <tr><td class="cap-num">7</td><td class="cap-name">Оценка мотивации и готовности к переходу</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--red)">15%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-low">Высокий</span></td></tr>
+        <tr><td class="cap-num">8</td><td class="cap-name">Конкурентная разведка (оргструктуры, компенсации)</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">50%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3-Q4</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">9</td><td class="cap-name">Подготовка досье / отчёта по кандидату</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">10</td><td class="cap-name">Мониторинг рынка (смена позиций)</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">55%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- 4. СКРИНЕР РЕЗЮМЕ -->
+<div class="role-section" id="role-4">
+  <div class="role-card">
+    <div class="role-header">
+      <div class="role-num">4</div>
+      <div class="role-info">
+        <div class="role-title">Скринер резюме</div>
+        <div class="role-replaces">AI-замена: Цифровой скринер | 70-80% FTE</div>
+      </div>
+      <div class="role-meta"><span class="badge b-fte">70-80% FTE</span><span class="badge b-stage">Q2-Q3 2026</span></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="cap-table">
+      <thead><tr><th>#</th><th>Функция</th><th>Вес</th><th>Автоматиз.</th><th>Ден. эффект</th><th>Измеримость</th><th>Делаем</th><th>MVP</th><th>Риск</th></tr></thead>
+      <tbody>
+        <tr><td class="cap-num">1</td><td class="cap-name">Парсинг резюме из разных форматов</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--green)">95%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">2</td><td class="cap-name">Матчинг резюме с требованиями вакансии</td><td class="mono-sm">20%</td><td class="mono-sm" style="color:var(--green)">90%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">3</td><td class="cap-name">Ранжирование кандидатов по релевантности</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--green)">90%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">4</td><td class="cap-name">Фильтрация по hard requirements</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--green)">95%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">5</td><td class="cap-name">Выявление red flags (gaps, частая смена)</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">65%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">6</td><td class="cap-name">Формирование short-list</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--green)">85%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">7</td><td class="cap-name">Интеграция в ATS (Copilot Hub)</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--green)">80%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">8</td><td class="cap-name">Автоматическая обратная связь кандидатам</td><td class="mono-sm">3%</td><td class="mono-sm" style="color:var(--green)">70%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">9</td><td class="cap-name">Дедупликация кандидатов в базе</td><td class="mono-sm">3%</td><td class="mono-sm" style="color:var(--green)">80%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">10</td><td class="cap-name">Аналитика качества скрининга (bias-аудит)</td><td class="mono-sm">4%</td><td class="mono-sm" style="color:var(--yellow)">50%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- 5. НАСТАВНИК -->
+<div class="role-section" id="role-5">
+  <div class="role-card">
+    <div class="role-header">
+      <div class="role-num">5</div>
+      <div class="role-info">
+        <div class="role-title">Наставник по адаптации (buddy)</div>
+        <div class="role-replaces">AI-замена: Цифровой наставник | 35-45% FTE</div>
+      </div>
+      <div class="role-meta"><span class="badge b-fte">35-45% FTE</span><span class="badge b-stage">Q3 2026</span></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="cap-table">
+      <thead><tr><th>#</th><th>Функция</th><th>Вес</th><th>Автоматиз.</th><th>Ден. эффект</th><th>Измеримость</th><th>Делаем</th><th>MVP</th><th>Риск</th></tr></thead>
+      <tbody>
+        <tr><td class="cap-num">1</td><td class="cap-name">Welcome-коммуникация и onboarding-пакет</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--green)">85%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">2</td><td class="cap-name">Персональный трек обучения (по роли)</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--green)">70%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">3</td><td class="cap-name">Ответы на вопросы новичка 24/7 (AI-buddy)</td><td class="mono-sm">20%</td><td class="mono-sm" style="color:var(--green)">80%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">4</td><td class="cap-name">Знакомство с командой, оргструктурой</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">50%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">5</td><td class="cap-name">Чек-листы и трекинг задач испытательного</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--green)">75%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">6</td><td class="cap-name">Check-in на 30/60/90 день</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">7</td><td class="cap-name">Масштабирование на разные роли и БЮ</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--green)">70%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">8</td><td class="cap-name">Автоматизация IT/HR-тикетов новичка</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--green)">75%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">9</td><td class="cap-name">Оценка прохождения испытательного срока</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--red)">30%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-low">Высокий</span></td></tr>
+        <tr><td class="cap-num">10</td><td class="cap-name">Аналитика адаптации (NPS, time-to-productivity)</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">55%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-high">Низкий</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- 6. HR-АНАЛИТИК -->
+<div class="role-section" id="role-6">
+  <div class="role-card">
+    <div class="role-header">
+      <div class="role-num">6</div>
+      <div class="role-info">
+        <div class="role-title">HR-аналитик / аналитик вовлечённости</div>
+        <div class="role-replaces">AI-замена: Цифровой аналитик эффективности | 50-60% FTE</div>
+      </div>
+      <div class="role-meta"><span class="badge b-fte">50-60% FTE</span><span class="badge b-stage">Q3 2026</span></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="cap-table">
+      <thead><tr><th>#</th><th>Функция</th><th>Вес</th><th>Автоматиз.</th><th>Ден. эффект</th><th>Измеримость</th><th>Делаем</th><th>MVP</th><th>Риск</th></tr></thead>
+      <tbody>
+        <tr><td class="cap-num">1</td><td class="cap-name">Саммаризация Performance Review</td><td class="mono-sm">20%</td><td class="mono-sm" style="color:var(--green)">85%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">2</td><td class="cap-name">Предиктивная аналитика (риск ухода)</td><td class="mono-sm">20%</td><td class="mono-sm" style="color:var(--green)">70%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">3</td><td class="cap-name">AI-рекомендации по развитию</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">65%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">4</td><td class="cap-name">NLP-анализ опросов вовлечённости</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--green)">80%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">5</td><td class="cap-name">Калибровка оценок между подразделениями</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--red)">30%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-low">Высокий</span></td></tr>
+        <tr><td class="cap-num">6</td><td class="cap-name">Генерация дашбордов и отчётов</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">7</td><td class="cap-name">Бенчмаркинг метрик с рынком</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">45%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">8</td><td class="cap-name">Формирование action plans</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">50%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">9</td><td class="cap-name">Real-time мониторинг вовлечённости</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">55%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">10</td><td class="cap-name">Выявление паттернов (burnout, toxic mgmt)</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">50%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-low">Высокий</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- 7. OKR -->
+<div class="role-section" id="role-7">
+  <div class="role-card">
+    <div class="role-header">
+      <div class="role-num">7</div>
+      <div class="role-info">
+        <div class="role-title">Специалист по целеполаганию (OKR)</div>
+        <div class="role-replaces">AI-замена: Цифровой фасилитатор OKR | 40% HR + 30% менеджеров</div>
+      </div>
+      <div class="role-meta"><span class="badge b-fte">40% + 30%</span><span class="badge b-stage">Q2-Q3 2026</span></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="cap-table">
+      <thead><tr><th>#</th><th>Функция</th><th>Вес</th><th>Автоматиз.</th><th>Ден. эффект</th><th>Измеримость</th><th>Делаем</th><th>MVP</th><th>Риск</th></tr></thead>
+      <tbody>
+        <tr><td class="cap-num">1</td><td class="cap-name">Генерация черновиков целей из стратегии</td><td class="mono-sm">20%</td><td class="mono-sm" style="color:var(--green)">75%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">2</td><td class="cap-name">Каскадирование целей сверху-вниз / снизу-вверх</td><td class="mono-sm">20%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">3</td><td class="cap-name">SMART-валидация формулировок OKR</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--green)">85%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">4</td><td class="cap-name">Расчёт стоимости совещаний</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--green)">90%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q2 2026</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">5</td><td class="cap-name">Трекинг прогресса по OKR (check-in)</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">55%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">6</td><td class="cap-name">Фасилитация сессий целеполагания</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">45%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q3 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">7</td><td class="cap-name">Выявление конфликтов целей между командами</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">50%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">8</td><td class="cap-name">Обучение сотрудников методологии OKR</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">55%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">9</td><td class="cap-name">Отчётность по достижению целей</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">10</td><td class="cap-name">Связь целей с Performance Review и C&B</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--red)">25%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-low">Высокий</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- 8. ТРЕНЕР -->
+<div class="role-section" id="role-8">
+  <div class="role-card">
+    <div class="role-header">
+      <div class="role-num">8</div>
+      <div class="role-info">
+        <div class="role-title">Тренер / L&D-специалист</div>
+        <div class="role-replaces">AI-замена: Цифровой тренер | 20-30% FTE</div>
+      </div>
+      <div class="role-meta"><span class="badge b-fte">20-30% FTE</span><span class="badge b-stage">Q4 2026</span></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="cap-table">
+      <thead><tr><th>#</th><th>Функция</th><th>Вес</th><th>Автоматиз.</th><th>Ден. эффект</th><th>Измеримость</th><th>Делаем</th><th>MVP</th><th>Риск</th></tr></thead>
+      <tbody>
+        <tr><td class="cap-num">1</td><td class="cap-name">Персонализированное обучение (под роль)</td><td class="mono-sm">20%</td><td class="mono-sm" style="color:var(--green)">70%</td><td><span class="tag tag-high">High</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q4 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">2</td><td class="cap-name">Адаптивные тренинги (подстройка сложности)</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-yes">Да</span></td><td class="cap-date" contenteditable="true">Q4 2026</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">3</td><td class="cap-name">AI-коучинг по soft skills</td><td class="mono-sm">15%</td><td class="mono-sm" style="color:var(--red)">35%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-partial">Частично</span></td><td class="cap-date" contenteditable="true">Q4 2026</td><td><span class="tag tag-low">Высокий</span></td></tr>
+        <tr><td class="cap-num">4</td><td class="cap-name">Skill gap analysis</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">55%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">5</td><td class="cap-name">Создание обучающего контента (курсы, квизы)</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--yellow)">65%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">6</td><td class="cap-name">Симуляции и ролевые игры</td><td class="mono-sm">10%</td><td class="mono-sm" style="color:var(--red)">30%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-low">Высокий</span></td></tr>
+        <tr><td class="cap-num">7</td><td class="cap-name">Оценка эффективности обучения (ROI)</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">50%</td><td><span class="tag tag-med">Medium</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">8</td><td class="cap-name">Рекомендация внешних курсов</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--green)">70%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-med">Medium</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-high">Низкий</span></td></tr>
+        <tr><td class="cap-num">9</td><td class="cap-name">Управление LMS (назначение, трекинг)</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--yellow)">60%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-high">High</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-med">Средний</span></td></tr>
+        <tr><td class="cap-num">10</td><td class="cap-name">Менторинг и карьерное консультирование</td><td class="mono-sm">5%</td><td class="mono-sm" style="color:var(--red)">20%</td><td><span class="tag tag-low">Low</span></td><td><span class="tag tag-low">Low</span></td><td><span class="status s-no">Нет</span></td><td class="cap-date" contenteditable="true">—</td><td><span class="tag tag-low">Высокий</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- ИТОГО -->
+<!-- ======================================================== -->
+<div class="summary-section">
+  <div class="summary-card">
+    <h2>Итого по всем AI-сотрудникам</h2>
+    <p style="font-size:.88rem;color:var(--text-sec);line-height:1.7;margin-top:1rem">
+      <strong style="color:var(--text)">20 HR-ролей</strong> в организации &rarr; <strong style="color:var(--green)">8</strong> получают AI-замену в 2026, <strong style="color:var(--yellow)">5</strong> — потенциал, <strong style="color:var(--red)">7</strong> остаются за человеком.<br>
+      По 8 заменяемым ролям: <strong style="color:var(--green)">48 функций</strong> делаем, <strong style="color:var(--yellow)">12</strong> частично, <strong style="color:var(--red)">21</strong> не покрыто.<br>
+      Самый высокий потенциал автоматизации: <strong style="color:var(--green)">скринер резюме (90%)</strong> и <strong style="color:var(--green)">HR-консультант (85%)</strong>.<br>
+      Самый низкий: <strong style="color:var(--red)">тренер (30%)</strong> — прототип, основные функции не покрыты, высокий риск.
+    </p>
+  </div>
+</div>
+
+<footer class="foot">
+  HR → AI: Карта замены ролей и функций · Уровень 0: сводная аналитика · Уровень 1: все HR-роли · Уровень 2: детализация по капабилити · Апрель 2026
+</footer>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'hr_ai_matrix_edits_v1';
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){ saved = {}; }
+
+  var cells = document.querySelectorAll('[contenteditable="true"]');
+  cells.forEach(function(cell, i){
+    var id = 'cell_' + i;
+    cell.setAttribute('data-edit-id', id);
+    if (saved[id] !== undefined) cell.textContent = saved[id];
+    cell.addEventListener('blur', function(){
+      var data = {};
+      try { data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){}
+      data[id] = cell.textContent;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    });
+  });
+
+  // Кнопка сброса
+  var btn = document.createElement('button');
+  btn.textContent = '↺ Сбросить мои правки';
+  btn.style.cssText = 'position:fixed;bottom:16px;right:16px;background:rgba(99,102,241,.15);color:#a5b4fc;border:1px solid rgba(99,102,241,.4);padding:8px 14px;border-radius:8px;font-family:Onest,sans-serif;font-size:.78rem;cursor:pointer;backdrop-filter:blur(8px);z-index:1000';
+  btn.addEventListener('mouseenter', function(){ btn.style.background='rgba(99,102,241,.25)'; });
+  btn.addEventListener('mouseleave', function(){ btn.style.background='rgba(99,102,241,.15)'; });
+  btn.addEventListener('click', function(){
+    if (confirm('Сбросить все ваши правки сроков MVP к исходным значениям?')) {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+  });
+  document.body.appendChild(btn);
+})();
+</script>
+</body>
+</html>
